@@ -119,7 +119,7 @@ export default function MoodScreen({ onComplete, setAppBgColor }) {
   };
 
   const handlePointerUp = () => {
-    if (isDragging) vibrate(20);
+    if (isDragging) vibrate(15);
     setIsDragging(false);
     if (rafRef.current) {
       cancelAnimationFrame(rafRef.current);

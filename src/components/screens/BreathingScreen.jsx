@@ -29,14 +29,15 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
     vibrate(10);
   };
 
+
   const phaseRef = useRef(phase);
   phaseRef.current = phase;
 
   // Trigger haptic pulses cleanly on state changes
   useEffect(() => {
-    if (phase === 'Inhale' || phase === 'Hold' || phase === 'Exhale') {
-      vibrate(15);
-    }
+    if (phase === 'Inhale') vibrate(30);
+    if (phase === 'Hold') vibrate([10, 40, 10]);
+    if (phase === 'Exhale') vibrate(60);
   }, [phase]);
 
   // Accessibility check

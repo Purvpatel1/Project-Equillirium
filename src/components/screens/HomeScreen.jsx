@@ -3,10 +3,12 @@ import { getSessions } from '../../utils/storage';
 import { vibrate } from '../../utils/haptics';
 import ScatterPlot from '../ScatterPlot';
 import { Play, Flame, Clock, Calendar, ChevronRight, Sparkles } from 'lucide-react';
+import ProgressDrawer from '../ProgressDrawer';
 
 export default function HomeScreen({ onStart, streak }) {
   const [sessions, setSessions] = useState([]);
-  const [stats, setStats] = useState({ total: 0, todayTime: "0s" });
+  const [stats, setStats] = useState({ total: 0, todayCount: 0 });
+  const [showDrawer, setShowDrawer] = useState(false);
 
   useEffect(() => {
     const all = getSessions();
@@ -88,11 +90,14 @@ export default function HomeScreen({ onStart, streak }) {
           </div>
 
           <button
-            className="mt-6 flex items-center gap-2 text-white/40 hover:text-teal-300 text-[10px] uppercase tracking-widest transition-all group"
-            onClick={() => vibrate(10)}
+            className="mt-6 flex items-center gap-2 text-white/40 hover:text-teal-300 text-[10px] uppercase tracking-widest transition-all group duration-300 hover:translate-x-1"
+            onClick={() => {
+              vibrate(15);
+              setShowDrawer(true);
+            }}
           >
             <span>Explore Progress</span>
-            <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+            <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform duration-300" />
           </button>
         </div>
 
@@ -110,6 +115,14 @@ export default function HomeScreen({ onStart, streak }) {
           </span>
         </button>
       </div>
+
+      <ProgressDrawer
+        isOpen={showDrawer}
+        onClose={() => setShowDrawer(false)}
+        sessions={sessions}
+        stats={stats}
+        streak={streak}
+      />
     </div>
   );
 }

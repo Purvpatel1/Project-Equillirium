@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { vibrate } from '../../utils/haptics';
 import { Play, Pause, Plus, Minus, ArrowUp, ArrowDown, Circle } from 'lucide-react';
 
@@ -147,47 +147,65 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
     };
   }, [inhale, hold, exhale, isPaused]);
 
-  // Reset phase when durations change to keep JS logic and CSS animation in sync
-  useEffect(() => {
-    if (phase !== 'Init') {
-      setPhase('Init');
-      phaseRef.current = 'Init';
-    }
-  }, [inhale, hold, exhale]);
-
   // Phase Overlay Tinting
   const getOverlayStyle = () => {
     let bgColor = 'rgba(163, 177, 138, 0.04)'; // sage/exhale
 
     if (phase === 'Inhale' || phase === 'InitTransition') {
-      bgColor = 'rgba(107, 125, 92, 0.06)'; // olive/inhale
+      bgColor = 'rgba(107, 125, 92, 0.05)'; // olive/inhale
     } else if (phase === 'Hold') {
-      bgColor = 'rgba(163, 177, 138, 0.08)';
+      bgColor = 'rgba(163, 177, 138, 0.06)'; // sage/hold
     } else if (phase === 'Exhale' || phase === 'Init') {
       bgColor = 'rgba(163, 177, 138, 0.04)';
     }
 
     return {
       backgroundColor: bgColor,
-      transition: 'background-color 1.5s cubic-bezier(0.4, 0, 0.2, 1)'
+      transition: 'background-color 1.5s ease-in-out'
     };
   };
 
   // Derived styles for GPU accelerated blob transition
-  // Derived styles for GPU accelerated blob transition
   const getBlobContainerStyle = () => {
-    // Standard static styles for Init/Reduced Motion
-    if (phase === 'Init' || phase === 'InitTransition' || isReducedMotion) {
+    // Step 1: Initial Render State -> NO transition
+    if (phase === 'Init') {
       return {
-        transform: phase === 'Inhale' || phase === 'Hold' ? 'scale(1.3)' : 'scale(1)',
-        opacity: isReducedMotion ? (phase === 'Inhale' || phase === 'Hold' ? 0.9 : 0.5) : 1,
-        transition: isReducedMotion ? `opacity ${exhale}s ease-in-out` : 'none',
-        filter: `drop-shadow(0 0 ${10 + level * 3}px rgba(163, 177, 138, 0.1))`
+        transform: 'scale(0.95)',
+        transition: 'none',
+        filter: 'drop-shadow(0 0 20px rgba(124, 92, 191, 0.2))'
+      };
+    }
+
+    let scale = 0.95;
+    let duration = exhale;
+
+    if (phase === 'InitTransition') {
+      scale = 0.95;
+      duration = inhale; // Prep transition duration
+    } else if (phase === 'Inhale') {
+      scale = 1.5;
+      duration = inhale;
+    } else if (phase === 'Hold') {
+      scale = 1.5;
+      duration = hold; // Scale remains stable
+    } else if (phase === 'Exhale') {
+      scale = 0.95;
+      duration = exhale; // Contracts smoothly
+    }
+
+    if (isReducedMotion) {
+      return {
+        opacity: phase === 'Inhale' || phase === 'Hold' ? 0.9 : 0.5,
+        transition: `opacity ${duration}s ease-in-out`
       };
     }
 
     return {
-      animationPlayState: isPaused ? 'paused' : 'running'
+      transform: `scale(${scale})`,
+      transition: `transform ${duration}s cubic-bezier(0.4, 0, 0.2, 1), filter ${duration}s ease-in-out`,
+      filter: phase === 'Inhale' || phase === 'Hold'
+        ? `drop-shadow(0 0 ${40 + level * 5}px rgba(107, 125, 92, ${0.15 + level * 0.02}))`
+        : `drop-shadow(0 0 ${20 + level * 3}px rgba(107, 125, 92, ${0.05 + level * 0.01}))`
     };
   };
 
@@ -209,9 +227,9 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
     return {};
   };
 
-  // Organic blob morphing paths - Refined for "Sahibee" aesthetic (more circular, premium feel)
-  const pathExhale = "M 100 30 C 138.6 30, 170 61.4, 170 100 C 170 138.6, 138.6 170, 100 170 C 61.4 170, 30 138.6, 30 100 C 30 61.4, 61.4 30, 100 30 Z";
-  const pathInhale = "M 100 10 C 149.7 10, 190 50.3, 190 100 C 190 149.7, 149.7 190, 100 190 C 50.3 190, 10 149.7, 10 100 C 10 50.3, 50.3 10, 100 10 Z";
+  // Organic blob morphing paths
+  const pathExhale = "M 90 25 C 140 15, 175 60, 175 100 C 175 140, 130 180, 95 175 C 60 170, 25 140, 25 95 C 25 50, 40 35, 90 25 Z";
+  const pathInhale = "M 100 15 C 160 20, 185 55, 185 105 C 185 155, 145 185, 105 185 C 65 185, 15 150, 15 100 C 15 50, 40 10, 100 15 Z";
 
   const getBlobPath = () => {
     return phase === 'Exhale' ? pathExhale : pathInhale;
@@ -239,53 +257,8 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
     let duration = exhale;
     if (phase === 'Inhale') duration = inhale;
     if (phase === 'Hold') duration = hold;
-    // Special case for InitTransition to avoid jump
-    if (phase === 'InitTransition') return 'none';
     return `stroke-dashoffset ${duration}s linear`;
   };
-
-  // Continuous Cycle Logic - Calculated once per setting change to ensure perfect smoothness
-  const { totalDuration, inhalePercent, holdPercent, dynamicStyles } = useMemo(() => {
-    const total = inhale + hold + exhale;
-    const iPercent = (inhale / total) * 100;
-    const hPercent = ((inhale + hold) / total) * 100;
-
-    // Derived visual tokens
-    const sInhale = `0 0 60px rgba(107, 125, 92, 0.25)`;
-    const sExhale = `0 0 40px rgba(107, 125, 92, 0.15)`;
-
-    const styles = `
-      @keyframes breatheCycle {
-        0%, 100% { 
-          transform: scale(1); 
-          filter: drop-shadow(${sExhale});
-        }
-        ${iPercent}% { 
-          transform: scale(1.3); 
-          filter: drop-shadow(${sInhale});
-        }
-        ${hPercent}% { 
-          transform: scale(1.3); 
-          filter: drop-shadow(${sInhale});
-        }
-      }
-
-      @keyframes pathCycle {
-        0%, 100% { d: path("${pathExhale}"); }
-        ${iPercent}%, ${hPercent}% { d: path("${pathInhale}"); }
-      }
-
-      .blob-cycling {
-        animation: breatheCycle ${total}s ease-in-out infinite;
-      }
-
-      .path-cycling {
-        animation: pathCycle ${total}s ease-in-out infinite;
-      }
-    `;
-
-    return { totalDuration: total, inhalePercent: iPercent, holdPercent: hPercent, dynamicStyles: styles };
-  }, [inhale, hold, exhale, level, pathInhale, pathExhale]);
 
   const css = `
     @keyframes ripple {
@@ -296,8 +269,8 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
       position: absolute;
       inset: 0;
       border-radius: 50%;
-      border: 1px solid rgba(124, 92, 191, 0.4);
-      background: radial-gradient(circle, rgba(124,92,191,0.1) 0%, rgba(45,212,191,0.05) 100%);
+      border: 1px solid rgba(107, 125, 92, 0.15);
+      background: radial-gradient(circle, rgba(163, 177, 138, 0.05) 0%, transparent 100%);
       animation: ripple 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
       animation-play-state: ${isPaused ? 'paused' : 'running'};
     }
@@ -320,9 +293,7 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
       animation: textFadeIn 0.3s ease forwards;
     }
 
-    ${dynamicStyles}
-
-    @keyframes gradientShift {
+    @keyframes lightGradientShift {
       0%   { background-position: 0% 50%; }
       50%  { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
@@ -332,19 +303,12 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
         135deg,
         #F7F8F4,
         #EEF1E8,
-        #FBFBF9,
+        #F2F5ED,
         #EEF1E8,
         #F7F8F4
       );
       background-size: 400% 400%;
-      animation: gradientShift 18s ease-in-out infinite;
-    }
-    .breathing-bg::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle, rgba(107,125,92,0.03), transparent);
-      pointer-events: none;
+      animation: lightGradientShift 18s ease-in-out infinite;
     }
 
     @keyframes valueChange {
@@ -357,11 +321,11 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
 
     .control-container {
       background: rgba(255, 255, 255, 0.5);
-      backdrop-filter: blur(25px);
+      backdrop-filter: blur(24px);
       border-radius: 32px;
-      border: 1px solid rgba(107, 125, 92, 0.05);
+      border: 1px solid rgba(107, 125, 92, 0.08);
       box-shadow: 
-        0 20px 50px rgba(107, 125, 92, 0.05),
+        0 20px 40px -10px rgba(107, 125, 92, 0.1),
         inset 0 1px 0 rgba(255, 255, 255, 0.8);
     }
   `;
@@ -374,15 +338,15 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
       <div className="fixed inset-0 pointer-events-none z-0" style={getOverlayStyle()}></div>
 
       {/* Top Header & Instruction */}
-      <div className="w-full flex flex-col items-center gap-12 z-20 shrink-0 mt-2">
-        <div className="w-full flex justify-between text-[#6E6E6E]/40 text-[10px] tracking-[0.4em] font-sans uppercase px-4 font-medium">
-          <span>Project Equilibrium</span>
-          <span>Cycles: {cycles}</span>
+      <div className="w-full flex flex-col items-center gap-4 z-20 shrink-0">
+        <div className="w-full flex justify-between text-[var(--color-text-muted)] text-[9px] tracking-[0.3em] font-sans uppercase px-2 opacity-50">
+          <span>Equilibrium</span>
+          <span>Session Progress</span>
         </div>
         
         {/* Instruction Text - Primary Guidance */}
-        <div className={`flex items-center justify-center transition-all duration-500 ${textAnimClass === 'text-in' ? 'instruction-in' : 'opacity-0'}`}>
-          <span className="text-[14px] font-sans tracking-[0.4em] text-[#6E6E6E] uppercase font-medium text-center">
+        <div className={`flex items-center justify-center ${textAnimClass === 'text-in' ? 'instruction-in' : 'opacity-0'}`}>
+          <span className="text-[clamp(1rem,2.5vw,1.2rem)] font-sans tracking-[0.25em] text-[var(--color-text-main)] uppercase font-semibold text-center opacity-80">
             {getInstructionText(textPhase)}
           </span>
         </div>
@@ -410,8 +374,8 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
 
             {/* SVG Progress Arc */}
             {!isReducedMotion && (
-              <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 320 320">
-                <circle cx="160" cy="160" r={radius} stroke="rgba(107,125,92,0.04)" strokeWidth="2" fill="none" />
+              <svg className="absolute inset-0 w-full h-full pointer-events-none drop-shadow-lg" viewBox="0 0 320 320">
+                <circle cx="160" cy="160" r={radius} stroke="rgba(107, 125, 92, 0.06)" strokeWidth="1.5" fill="none" />
                 <circle
                   cx="160" cy="160" r={radius}
                   stroke="url(#arcGradient)"
@@ -432,50 +396,37 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
             )}
 
             {/* Central Blob with Integrated Text */}
-            <div 
-              className={`absolute w-[240px] h-[240px] flex items-center justify-center ${phase !== 'Init' && phase !== 'InitTransition' && !isReducedMotion ? 'blob-cycling' : ''}`} 
-              style={getBlobContainerStyle()}
-            >
+            <div className="absolute w-[240px] h-[240px] flex items-center justify-center" style={getBlobContainerStyle()}>
               {/* Blob SVG */}
-              <div className="absolute inset-0 opacity-100 drop-shadow-[0_15px_35px_rgba(107,125,92,0.12)]">
+              <div className="absolute inset-0 opacity-90">
                 <svg viewBox="0 0 200 200" className="w-full h-full overflow-visible">
                   <defs>
                     <linearGradient id="blobGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#A3B18A" />
-                      <stop offset="100%" stopColor="#6B7D5C" />
+                      <stop offset="0%" stopColor="#6B7D5C" />
+                      <stop offset="100%" stopColor="#A3B18A" />
                     </linearGradient>
-                    <radialGradient id="innerLight" cx="30%" cy="30%" r="50%">
-                       <stop offset="0%" stopColor="rgba(255,255,255,0.2)" />
-                       <stop offset="100%" stopColor="transparent" />
-                    </radialGradient>
                   </defs>
                   <path
                     d={getBlobPath()}
                     fill="url(#blobGradient)"
-                    className={phase !== 'Init' && phase !== 'InitTransition' && !isReducedMotion ? 'path-cycling' : ''}
-                    style={{ animationPlayState: isPaused ? 'paused' : 'running' }}
-                  />
-                  <path
-                    d={getBlobPath()}
-                    fill="url(#innerLight)"
-                    className={`pointer-events-none ${phase !== 'Init' && phase !== 'InitTransition' && !isReducedMotion ? 'path-cycling' : ''}`}
-                    style={{ animationPlayState: isPaused ? 'paused' : 'running' }}
+                    style={getBlobPathStyle()}
+                    className="drop-shadow-[0_8px_20px_rgba(107,125,92,0.2)]"
                   />
                 </svg>
               </div>
 
               {/* Main Phase Text - Remains Inside Blob */}
-              <div className={`z-10 flex flex-col items-center pointer-events-none transition-all duration-500 ${textAnimClass}`}>
+              <div className={`z-10 flex flex-col items-center pointer-events-none ${textAnimClass}`}>
                 <div 
-                  className="text-4xl sm:text-5xl font-serif text-theme-bg tracking-widest text-center opacity-80 font-normal"
+                  className="text-4xl sm:text-5xl font-serif text-white/95 drop-shadow-sm tracking-wide text-center"
                   style={getMainTextStyle()}
                 >
                   {isPaused ? 'Paused' : textPhase}
                 </div>
                 
                 {isPaused && (
-                  <div className="text-[10px] text-white/40 mt-1 font-sans tracking-widest uppercase animate-pulse">
-                    Take your time
+                  <div className="text-[10px] text-white/60 mt-1 font-sans tracking-[0.2em] uppercase animate-pulse">
+                    Gentle Pause
                   </div>
                 )}
               </div>
@@ -485,19 +436,19 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
 
         {/* Guidance Text (Secondary Feedback) */}
         {!isPaused && phase !== 'Init' && (
-          <div className="text-[clamp(0.85rem,1.5vw,1rem)] text-theme-olive/40 font-sans tracking-[0.1em] text-center animate-pulse h-5 mb-6 shrink-0 font-medium">
+          <div className="text-[clamp(0.85rem,1.5vw,1rem)] text-teal-200/50 font-sans tracking-[0.1em] text-center animate-pulse h-5 mb-4 shrink-0">
             {guidanceText}
           </div>
         )}
 
         {/* Level-based presets */}
         {level >= 3 && (
-          <div className="flex gap-2 mb-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          <div className="flex gap-2 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
             {presets.filter(p => level >= p.unlockLevel).map(p => (
               <button
                 key={p.id}
                 onClick={() => selectPreset(p)}
-                className={`px-5 py-2.5 rounded-[20px] text-[10px] uppercase tracking-widest border transition-all duration-300 font-semibold ${inhale === p.inhale && hold === p.hold && exhale === p.exhale ? 'bg-theme-olive text-white border-theme-olive shadow-md' : 'bg-[#EEF1E8] border-theme-olive/5 text-[#6E6E6E] hover:bg-[#EEF1E8]/80'}`}
+                className={`px-4 py-2 rounded-xl text-[10px] uppercase tracking-widest border transition-all duration-300 ${inhale === p.inhale && hold === p.hold && exhale === p.exhale ? 'bg-teal-400/20 border-teal-400/40 text-teal-300' : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'}`}
               >
                 {p.name}
               </button>
@@ -506,7 +457,7 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
         )}
 
         {/* Controls - Enhanced Glassmorphism Panel (Compressed) */}
-        <div className="bg-[#EEF1E8]/60 backdrop-blur-3xl p-6 flex flex-col items-center gap-6 text-sm text-[#2F2F2F] w-full max-w-md shrink-0 rounded-[32px] border border-theme-olive/5 shadow-sm">
+        <div className="control-container p-6 flex flex-col items-center gap-6 text-sm text-gray-300 w-full max-w-md shrink-0">
 
           {/* Pause/Play Button - Enhanced */}
           <button
@@ -514,10 +465,10 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
               setIsPaused(!isPaused);
               vibrate(20);
             }}
-            className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 active:scale-95 shadow-md border ${isPaused ? 'bg-theme-olive text-white border-theme-olive' : 'bg-white text-theme-olive border-theme-olive/10'}`}
+            className={`w-14 h-14 rounded-full flex items-center justify-center text-white transition-all duration-300 transform hover:scale-110 active:scale-95 shadow-[0_0_20px_rgba(124,92,191,0.3)] border border-white/20 ${isPaused ? 'bg-teal-500/20' : 'bg-white/10'}`}
             aria-label={isPaused ? "Resume" : "Pause"}
           >
-            {isPaused ? <Play size={24} className="ml-1 fill-current" /> : <Pause size={24} className="fill-current" />}
+            {isPaused ? <Play size={24} className="ml-1 fill-white/20" /> : <Pause size={24} className="fill-white/20" />}
           </button>
 
           <div className="flex justify-between w-full gap-4">
@@ -527,12 +478,12 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
               { label: 'Exhale', value: exhale, setter: setExhale, min: 2, max: 15, icon: ArrowDown, color: 'text-rose-400' }
             ].map((ctrl) => (
               <div key={ctrl.label} className="flex flex-col items-center flex-1 group">
-                <div className="flex flex-col items-center gap-1.5 mb-3">
-                  <ctrl.icon size={10} className={`${ctrl.color} opacity-60 group-hover:opacity-100 transition-opacity`} />
-                  <span className="text-[9px] uppercase tracking-[0.25em] text-theme-muted/40 font-sans font-semibold">{ctrl.label}</span>
+                <div className="flex flex-col items-center gap-1 mb-2">
+                  <ctrl.icon size={10} className={`${ctrl.color} opacity-40 group-hover:opacity-100 transition-opacity`} />
+                  <span className="text-[9px] uppercase tracking-[0.2em] text-white/30 font-sans font-medium">{ctrl.label}</span>
                 </div>
                 
-                <div className="flex items-center gap-2 bg-[#F7F8F4] p-1.5 rounded-[18px] border border-theme-olive/5 shadow-sm">
+                <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/5 hover:border-teal-500/30 transition-all duration-300">
                   <button 
                     onClick={() => {
                       if (ctrl.value > ctrl.min) {
@@ -540,12 +491,12 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
                         vibrate(10);
                       }
                     }}
-                    className="p-1.5 rounded-xl hover:bg-[#EEF1E8] text-[#6E6E6E]/40 hover:text-theme-olive transition-colors"
+                    className="p-1 rounded-lg hover:bg-white/5 text-white/40 hover:text-white transition-colors"
                   >
                     <Minus size={12} />
                   </button>
                   
-                  <div key={ctrl.value} className="w-6 text-center font-sans font-bold text-theme-olive text-xs value-pop">
+                  <div key={ctrl.value} className="w-6 text-center font-sans font-bold text-[var(--color-text-main)] text-xs value-pop">
                     {ctrl.value}
                   </div>
 
@@ -556,7 +507,7 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
                         vibrate(10);
                       }
                     }}
-                    className="p-1.5 rounded-xl hover:bg-[#EEF1E8] text-[#6E6E6E]/40 hover:text-theme-olive transition-colors"
+                    className="p-1 rounded-lg hover:bg-white/5 text-white/40 hover:text-white transition-colors"
                   >
                     <Plus size={12} />
                   </button>
@@ -571,9 +522,9 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
       <div className="w-full flex flex-col items-center gap-4 z-20 pb-4 shrink-0">
         <button
           onClick={() => onComplete({ inhale, hold, exhale })}
-          className={`px-10 py-4 rounded-full bg-theme-olive text-white text-sm font-medium tracking-wide transition-all duration-700 hover:scale-105 shadow-lg shadow-theme-olive/20 ${cycles > 0 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}
+          className={`px-10 py-3 rounded-full bg-[#6B7D5C] text-white text-sm font-medium tracking-wide transition-all duration-700 hover:scale-105 shadow-lg shadow-[#6B7D5C]/20 ${cycles > 0 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}
         >
-          Continue to Mood Check
+          Begin Reflection
         </button>
       </div>
     </div>

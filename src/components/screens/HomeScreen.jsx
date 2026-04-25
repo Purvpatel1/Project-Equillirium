@@ -34,61 +34,60 @@ export default function HomeScreen({ onStart, streak }) {
 
       {/* Ambient Background Elements */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#6B7D5C]/5 rounded-full blur-[120px] animate-home-bg"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#A3B18A]/5 rounded-full blur-[120px] animate-home-bg" style={{ animationDelay: '-5s' }}></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle,rgba(255,255,255,0.8),transparent)] opacity-40"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#A3B18A]/20 rounded-full blur-[100px] animate-home-bg"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#6B7D5C]/15 rounded-full blur-[100px] animate-home-bg" style={{ animationDelay: '-5s' }}></div>
       </div>
 
       <div className="relative z-10 flex flex-col items-center w-full max-w-md">
         <div className="mb-10 animate-in fade-in slide-in-from-top-4 duration-1000">
-          <h1 className="text-5xl font-serif font-medium mb-4 tracking-tight text-[#2F2F2F]">
-            Project Equilibrium
+          <h1 className="text-5xl font-serif font-medium mb-3 tracking-tight text-[var(--color-text-main)]">
+            Equilibrium
           </h1>
-          <div className="flex items-center justify-center gap-3 text-[#6E6E6E] tracking-[0.25em] font-light uppercase text-[10px]">
-            <Sparkles size={12} className="text-[#6B7D5C]/60" />
-            <span>Find your center</span>
-            <Sparkles size={12} className="text-[#6B7D5C]/60" />
+          <div className="flex items-center justify-center gap-2 text-[var(--color-text-muted)] tracking-[0.25em] font-light uppercase text-[10px]">
+            <span>Presence & Peace</span>
           </div>
         </div>
 
-        <div className="flex justify-center gap-10 mb-12 w-full animate-in fade-in slide-in-from-top-6 duration-1000 delay-200">
+        {/* Stats Row */}
+        <div className="flex justify-center gap-8 mb-12 w-full animate-in fade-in slide-in-from-top-6 duration-1000 delay-200">
           <div className="flex flex-col items-center">
-            <span className="text-[10px] uppercase tracking-widest text-[#6E6E6E]/50 mb-2 font-medium">Streak</span>
-            <div className="flex items-center gap-1.5 text-[#2F2F2F] font-semibold">
+            <span className="text-[10px] uppercase tracking-widest text-[var(--color-text-muted)] mb-1 opacity-60">Streak</span>
+            <div className="flex items-center gap-1.5 text-[var(--color-text-main)] font-semibold">
               <Flame size={14} className="text-[#6B7D5C]" />
               <span>{streak}d</span>
             </div>
           </div>
-          <div className="w-[1px] h-8 bg-[#2F2F2F]/10 self-center"></div>
+          <div className="w-[1px] h-8 bg-gray-200 self-center"></div>
           <div className="flex flex-col items-center">
-            <span className="text-[10px] uppercase tracking-widest text-[#6E6E6E]/50 mb-2 font-medium">Sessions</span>
-            <div className="flex items-center gap-1.5 text-[#2F2F2F] font-semibold">
+            <span className="text-[10px] uppercase tracking-widest text-[var(--color-text-muted)] mb-1 opacity-60">Sessions</span>
+            <div className="flex items-center gap-1.5 text-[var(--color-text-main)] font-semibold">
               <Calendar size={14} className="text-[#6B7D5C]" />
               <span>{stats.total}</span>
             </div>
           </div>
-          <div className="w-[1px] h-8 bg-[#2F2F2F]/10 self-center"></div>
+          <div className="w-[1px] h-8 bg-gray-200 self-center"></div>
           <div className="flex flex-col items-center">
-            <span className="text-[10px] uppercase tracking-widest text-[#6E6E6E]/50 mb-2 font-medium">Today</span>
-            <div className="flex items-center gap-1.5 text-[#2F2F2F] font-semibold">
+            <span className="text-[10px] uppercase tracking-widest text-[var(--color-text-muted)] mb-1 opacity-60">Today</span>
+            <div className="flex items-center gap-1.5 text-[var(--color-text-main)] font-semibold">
               <Clock size={14} className="text-[#6B7D5C]" />
               <span>{stats.todayCount}</span>
             </div>
           </div>
         </div>
 
-        <p className="text-[#6E6E6E] text-sm italic font-light mb-10 animate-in fade-in duration-1000 delay-400">
-          “Take a moment to reset your mind.”
+        {/* Support Text */}
+        <p className="text-[var(--color-text-muted)] text-sm italic font-light mb-10 animate-in fade-in duration-1000 delay-400 max-w-[280px] leading-relaxed">
+          “Inhale the present moment, exhale the past.”
         </p>
 
-        <div className="bg-[#EEF1E8] p-8 mb-12 w-full flex flex-col items-center rounded-[24px] shadow-sm animate-in fade-in zoom-in-95 duration-1000 delay-500">
-          <p className="text-[10px] uppercase tracking-[0.25em] text-[#6E6E6E]/60 mb-6 font-semibold">Recent Mood Flow</p>
+        <div className="glass-panel p-6 mb-12 w-full flex flex-col items-center animate-in fade-in zoom-in-95 duration-1000 delay-500 border-white/40">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)] mb-4 font-semibold opacity-40">Mood Journey</p>
           <div className="w-full h-[180px] flex items-center justify-center">
-            <ScatterPlot sessions={sessions.slice(-7)} width={240} height={180} small={true} light={true} />
+            <ScatterPlot sessions={sessions.slice(-7)} width={240} height={180} small={true} />
           </div>
 
           <button
-            className="mt-8 flex items-center gap-2 text-[#6E6E6E] hover:text-[#2F2F2F] text-[10px] uppercase tracking-widest transition-all group duration-300 hover:translate-x-1"
+            className="mt-6 flex items-center gap-2 text-[var(--color-text-muted)] hover:text-[var(--color-olive-primary)] text-[10px] uppercase tracking-widest transition-all group duration-300 hover:translate-x-1"
             onClick={() => {
               vibrate(15);
               setShowDrawer(true);
@@ -104,9 +103,9 @@ export default function HomeScreen({ onStart, streak }) {
             vibrate(20);
             onStart();
           }}
-          className="group relative inline-flex items-center justify-center px-14 py-5 font-medium tracking-[0.2em] text-white bg-theme-accent-olive rounded-[24px] overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-[0_10px_30px_rgba(107,125,92,0.25)] active:scale-95 animate-idle-pulse-light"
+          className="group relative inline-flex items-center justify-center px-14 py-5 font-medium tracking-[0.2em] text-white bg-[#6B7D5C] rounded-full overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-[0_10px_30px_rgba(107,125,92,0.25)] active:scale-95"
         >
-          <span className="relative flex items-center gap-4 uppercase text-[11px]">
+          <span className="relative flex items-center gap-4 uppercase text-xs">
             <Play size={16} fill="currentColor" />
             Begin Session
           </span>

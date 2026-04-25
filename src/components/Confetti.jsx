@@ -9,7 +9,7 @@ export default function Confetti() {
       x: Math.random() * 100,
       y: -10,
       size: Math.random() * 6 + 4,
-      color: ['#2DD4BF', '#7C5CBF', '#D4AF37', '#FFF'][Math.floor(Math.random() * 4)],
+      color: ['#6B7D5C', '#A3B18A', '#F7F8F4', '#EEF1E8'][Math.floor(Math.random() * 4)],
       delay: Math.random() * 0.5,
       duration: Math.random() * 1 + 1,
       angle: Math.random() * 360,

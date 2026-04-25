@@ -21,36 +21,27 @@
   animation: idle-pulse 4s ease-in-out infinite;
 }
 
-@keyframes idle-pulse-light {
-  0%, 100% { transform: scale(1); box-shadow: 0 5px 15px rgba(107,125,92,0.15); }
-  50% { transform: scale(1.03); box-shadow: 0 10px 25px rgba(107,125,92,0.25); }
-}
-
-.animate-idle-pulse-light {
-  animation: idle-pulse-light 4s ease-in-out infinite;
-}
-
 :root {
   --color-primary-bg: #F7F8F4;
   --color-secondary-bg: #EEF1E8;
-  --color-accent-olive: #6B7D5C;
-  --color-accent-sage: #A3B18A;
+  --color-olive-primary: #6B7D5C;
+  --color-sage-soft: #A3B18A;
   --color-text-main: #2F2F2F;
-  --color-text-secondary: #6E6E6E;
+  --color-text-muted: #5C5C5C;
   
-  --glass-bg: rgba(238, 241, 232, 0.4); /* Light olive tint glass */
+  --glass-bg: rgba(255, 255, 255, 0.4);
   --glass-border: rgba(107, 125, 92, 0.08);
-  --glass-shadow: 0 10px 40px rgba(107, 125, 92, 0.05);
+  --glass-shadow: 0 12px 48px -12px rgba(107, 125, 92, 0.12);
 }
 
 @layer base {
   body {
-    @apply bg-[#F7F8F4] text-[#2F2F2F] font-sans m-0 p-0 antialiased min-h-screen overflow-x-hidden transition-colors duration-500;
+    @apply bg-[var(--color-primary-bg)] text-[var(--color-text-main)] font-sans m-0 p-0 antialiased min-h-screen overflow-x-hidden transition-colors duration-500;
   }
 }
 
 .animated-gradient-bg {
-  background: linear-gradient(-45deg, #F7F8F4, #EEF1E8, #F1F4ED, #F7F8F4);
+  background: linear-gradient(-45deg, #F7F8F4, #EEF1E8, #F7F8F4, #F2F5ED);
   background-size: 400% 400%;
   animation: lightGradient 15s ease infinite;
 }
@@ -60,15 +51,6 @@
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .animated-gradient-bg {
-    animation: none;
-    background-size: 100% 100%;
-  }
-}
-
-
 
 .glass-panel {
   background: var(--glass-bg);

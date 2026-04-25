@@ -147,9 +147,9 @@ export default function MoodScreen({ onComplete, setAppBgColor }) {
 
   return (
     <div className="flex flex-col items-center justify-center p-6 w-full max-w-2xl fade-in min-h-screen relative z-10">
-      <h2 className="text-4xl font-serif font-medium mb-12 text-center text-[#2F2F2F] tracking-tight">How are you feeling?</h2>
+      <h2 className="text-4xl font-serif font-medium mb-12 text-center text-[var(--color-text-main)]">How are you feeling?</h2>
       
-      <div className="relative w-full aspect-square max-w-md glass-panel mb-12 touch-none overflow-hidden shadow-sm"
+      <div className="relative w-full aspect-square max-w-md glass-panel mb-10 touch-none overflow-hidden border-white/50"
            ref={gridRef}
            onPointerDown={handlePointerDown}
            onPointerMove={handlePointerMove}
@@ -158,45 +158,44 @@ export default function MoodScreen({ onComplete, setAppBgColor }) {
       >
         <div className="absolute top-1/2 left-0 right-0 h-px bg-[#6B7D5C]/10 pointer-events-none"></div>
         <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#6B7D5C]/10 pointer-events-none"></div>
-        
-        <div className="absolute top-5 left-5 flex items-center gap-2 text-[10px] font-semibold text-[#6E6E6E] select-none tracking-widest uppercase">
-          <Zap size={14} className="text-[#6B7D5C]/40" />
+        <div className="absolute top-4 left-4 flex items-center gap-2 text-[10px] font-semibold text-[var(--color-text-muted)] opacity-40 select-none tracking-widest uppercase">
+          <Zap size={14} className="text-orange-400" />
           Stressed
         </div>
-        <div className="absolute top-5 right-5 flex items-center gap-2 text-[10px] font-semibold text-[#6E6E6E] select-none tracking-widest uppercase">
-          Excited
-          <Sun size={14} className="text-[#6B7D5C]/40" />
+        <div className="absolute top-4 right-4 flex items-center gap-2 text-[10px] font-semibold text-[var(--color-text-muted)] opacity-40 select-none tracking-widest uppercase">
+          High Energy
+          <Sun size={14} className="text-[#A3B18A]" />
         </div>
-        <div className="absolute bottom-5 left-5 flex items-center gap-2 text-[10px] font-semibold text-[#6E6E6E] select-none tracking-widest uppercase">
-          <CloudRain size={14} className="text-[#6B7D5C]/40" />
-          Sad
+        <div className="absolute bottom-4 left-4 flex items-center gap-2 text-[10px] font-semibold text-[var(--color-text-muted)] opacity-40 select-none tracking-widest uppercase">
+          <CloudRain size={14} className="text-indigo-300" />
+          Low Energy
         </div>
-        <div className="absolute bottom-5 right-5 flex items-center gap-2 text-[10px] font-semibold text-[#6E6E6E] select-none tracking-widest uppercase">
-          Relaxed
-          <Wind size={14} className="text-[#6B7D5C]/40" />
+        <div className="absolute bottom-4 right-4 flex items-center gap-2 text-[10px] font-semibold text-[var(--color-text-muted)] opacity-40 select-none tracking-widest uppercase">
+          Calm
+          <Wind size={14} className="text-[#6B7D5C]" />
         </div>
 
         <div 
           ref={markerRef}
-          className="absolute w-10 h-10 -ml-5 -mt-5 rounded-full border-[3px] border-white cursor-grab active:cursor-grabbing shadow-md"
+          className="absolute w-12 h-12 -ml-6 -mt-6 rounded-full border-4 border-white/80 cursor-grab active:cursor-grabbing shadow-xl shadow-black/5"
           style={{ 
             left: markerLeft, 
             top: markerTop,
-            transform: isDragging ? 'scale(1.2)' : 'scale(1)',
-            transition: 'background-color 0.4s ease, transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+            transform: isDragging ? 'scale(1.15)' : 'scale(1)',
+            transition: 'background-color 0.4s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
           }}
         ></div>
       </div>
 
-      <div className="glass-panel px-10 py-4 rounded-3xl text-[11px] font-semibold tracking-[0.2em] text-[#6E6E6E] mb-14 uppercase">
-        Valence: {position.x.toFixed(2)} &nbsp;|&nbsp; Arousal: {position.y.toFixed(2)}
+      <div className="bg-white/40 backdrop-blur-md px-8 py-3 rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)] mb-12 border border-white/60 shadow-sm opacity-60">
+        Valence: {position.x.toFixed(2)} &nbsp;|&nbsp; Energy: {position.y.toFixed(2)}
       </div>
 
       <button
         onClick={() => onComplete({ valence: position.x, arousal: position.y })}
-        className="px-14 py-5 rounded-[24px] bg-[#6B7D5C] text-white font-medium tracking-widest uppercase text-[11px] shadow-md hover:scale-105 active:scale-95 transition-all duration-300"
+        className="px-14 py-4 rounded-full bg-[#6B7D5C] text-white font-medium tracking-[0.15em] uppercase text-xs shadow-lg shadow-[#6B7D5C]/20 hover:scale-105 transition-all duration-300 active:scale-95"
       >
-        Next Phase
+        Save Reflection
       </button>
     </div>
   );

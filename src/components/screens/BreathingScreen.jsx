@@ -251,8 +251,8 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
     const hPercent = ((inhale + hold) / total) * 100;
 
     // Derived visual tokens
-    const sInhale = `0 0 ${20 + level * 5}px rgba(107, 125, 92, 0.15)`;
-    const sExhale = `0 0 ${10 + level * 3}px rgba(163, 177, 138, 0.1)`;
+    const sInhale = `0 0 60px rgba(107, 125, 92, 0.25)`;
+    const sExhale = `0 0 40px rgba(107, 125, 92, 0.15)`;
 
     const styles = `
       @keyframes breatheCycle {
@@ -374,15 +374,15 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
       <div className="fixed inset-0 pointer-events-none z-0" style={getOverlayStyle()}></div>
 
       {/* Top Header & Instruction */}
-      <div className="w-full flex flex-col items-center gap-4 z-20 shrink-0">
-        <div className="w-full flex justify-between text-theme-olive/30 text-[9px] tracking-[0.35em] font-sans uppercase px-2 font-medium">
+      <div className="w-full flex flex-col items-center gap-12 z-20 shrink-0 mt-2">
+        <div className="w-full flex justify-between text-[#6E6E6E]/40 text-[10px] tracking-[0.4em] font-sans uppercase px-4 font-medium">
           <span>Project Equilibrium</span>
           <span>Cycles: {cycles}</span>
         </div>
         
         {/* Instruction Text - Primary Guidance */}
-        <div className={`flex items-center justify-center ${textAnimClass === 'text-in' ? 'instruction-in' : 'opacity-0'}`}>
-          <span className="text-[clamp(1rem,2.5vw,1.3rem)] font-sans tracking-[0.25em] text-theme-olive/70 uppercase font-medium text-center">
+        <div className={`flex items-center justify-center transition-all duration-500 ${textAnimClass === 'text-in' ? 'instruction-in' : 'opacity-0'}`}>
+          <span className="text-[14px] font-sans tracking-[0.4em] text-[#6E6E6E] uppercase font-medium text-center">
             {getInstructionText(textPhase)}
           </span>
         </div>
@@ -465,9 +465,9 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
               </div>
 
               {/* Main Phase Text - Remains Inside Blob */}
-              <div className={`z-10 flex flex-col items-center pointer-events-none ${textAnimClass}`}>
+              <div className={`z-10 flex flex-col items-center pointer-events-none transition-all duration-500 ${textAnimClass}`}>
                 <div 
-                  className="text-4xl sm:text-5xl font-serif text-theme-bg drop-shadow-sm tracking-wider text-center opacity-90"
+                  className="text-4xl sm:text-5xl font-serif text-theme-bg tracking-widest text-center opacity-80 font-normal"
                   style={getMainTextStyle()}
                 >
                   {isPaused ? 'Paused' : textPhase}
@@ -497,7 +497,7 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
               <button
                 key={p.id}
                 onClick={() => selectPreset(p)}
-                className={`px-5 py-2.5 rounded-2xl text-[10px] uppercase tracking-widest border transition-all duration-300 font-semibold ${inhale === p.inhale && hold === p.hold && exhale === p.exhale ? 'bg-theme-olive text-white border-theme-olive shadow-lg shadow-theme-olive/20' : 'bg-white/40 border-theme-olive/10 text-theme-olive/50 hover:bg-white/60 hover:border-theme-olive/20'}`}
+                className={`px-5 py-2.5 rounded-[20px] text-[10px] uppercase tracking-widest border transition-all duration-300 font-semibold ${inhale === p.inhale && hold === p.hold && exhale === p.exhale ? 'bg-theme-olive text-white border-theme-olive shadow-md' : 'bg-[#EEF1E8] border-theme-olive/5 text-[#6E6E6E] hover:bg-[#EEF1E8]/80'}`}
               >
                 {p.name}
               </button>
@@ -506,7 +506,7 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
         )}
 
         {/* Controls - Enhanced Glassmorphism Panel (Compressed) */}
-        <div className="control-container p-6 flex flex-col items-center gap-6 text-sm text-gray-300 w-full max-w-md shrink-0">
+        <div className="bg-[#EEF1E8]/60 backdrop-blur-3xl p-6 flex flex-col items-center gap-6 text-sm text-[#2F2F2F] w-full max-w-md shrink-0 rounded-[32px] border border-theme-olive/5 shadow-sm">
 
           {/* Pause/Play Button - Enhanced */}
           <button
@@ -514,7 +514,7 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
               setIsPaused(!isPaused);
               vibrate(20);
             }}
-            className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 active:scale-95 shadow-lg border ${isPaused ? 'bg-theme-olive text-white border-theme-olive' : 'bg-white text-theme-olive border-theme-olive/10'}`}
+            className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 active:scale-95 shadow-md border ${isPaused ? 'bg-theme-olive text-white border-theme-olive' : 'bg-white text-theme-olive border-theme-olive/10'}`}
             aria-label={isPaused ? "Resume" : "Pause"}
           >
             {isPaused ? <Play size={24} className="ml-1 fill-current" /> : <Pause size={24} className="fill-current" />}
@@ -532,7 +532,7 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
                   <span className="text-[9px] uppercase tracking-[0.25em] text-theme-muted/40 font-sans font-semibold">{ctrl.label}</span>
                 </div>
                 
-                <div className="flex items-center gap-2 bg-white/60 p-1.5 rounded-2xl border border-theme-olive/5 hover:border-theme-olive/20 transition-all duration-300 shadow-sm">
+                <div className="flex items-center gap-2 bg-[#F7F8F4] p-1.5 rounded-[18px] border border-theme-olive/5 shadow-sm">
                   <button 
                     onClick={() => {
                       if (ctrl.value > ctrl.min) {
@@ -540,7 +540,7 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
                         vibrate(10);
                       }
                     }}
-                    className="p-1.5 rounded-xl hover:bg-theme-olive/5 text-theme-olive/30 hover:text-theme-olive transition-colors"
+                    className="p-1.5 rounded-xl hover:bg-[#EEF1E8] text-[#6E6E6E]/40 hover:text-theme-olive transition-colors"
                   >
                     <Minus size={12} />
                   </button>
@@ -556,7 +556,7 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
                         vibrate(10);
                       }
                     }}
-                    className="p-1.5 rounded-xl hover:bg-theme-olive/5 text-theme-olive/30 hover:text-theme-olive transition-colors"
+                    className="p-1.5 rounded-xl hover:bg-[#EEF1E8] text-[#6E6E6E]/40 hover:text-theme-olive transition-colors"
                   >
                     <Plus size={12} />
                   </button>

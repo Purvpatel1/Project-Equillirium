@@ -147,53 +147,54 @@ export default function MoodScreen({ onComplete, setAppBgColor }) {
 
   return (
     <div className="flex flex-col items-center justify-center p-6 w-full max-w-2xl fade-in min-h-screen relative z-10">
-      <h2 className="text-4xl font-serif font-medium mb-12 text-center text-theme-olive tracking-tight">How are you feeling?</h2>
+      <h2 className="text-4xl font-serif font-medium mb-12 text-center text-[#2F2F2F] tracking-tight">How are you feeling?</h2>
       
-      <div className="relative w-full aspect-square max-w-md glass-panel mb-12 touch-none overflow-hidden"
+      <div className="relative w-full aspect-square max-w-md glass-panel mb-12 touch-none overflow-hidden shadow-sm"
            ref={gridRef}
            onPointerDown={handlePointerDown}
            onPointerMove={handlePointerMove}
            onPointerUp={handlePointerUp}
            onPointerLeave={handlePointerUp}
       >
-        <div className="absolute top-1/2 left-0 right-0 h-px bg-theme-olive/5 pointer-events-none"></div>
-        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-theme-olive/5 pointer-events-none"></div>
-        <div className="absolute top-5 left-5 flex items-center gap-2 text-[10px] font-semibold text-theme-olive/30 select-none tracking-widest uppercase">
-          <Zap size={14} className="text-theme-olive/40" />
+        <div className="absolute top-1/2 left-0 right-0 h-px bg-[#6B7D5C]/10 pointer-events-none"></div>
+        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#6B7D5C]/10 pointer-events-none"></div>
+        
+        <div className="absolute top-5 left-5 flex items-center gap-2 text-[10px] font-semibold text-[#6E6E6E] select-none tracking-widest uppercase">
+          <Zap size={14} className="text-[#6B7D5C]/40" />
           Stressed
         </div>
-        <div className="absolute top-5 right-5 flex items-center gap-2 text-[10px] font-semibold text-theme-olive/30 select-none tracking-widest uppercase">
+        <div className="absolute top-5 right-5 flex items-center gap-2 text-[10px] font-semibold text-[#6E6E6E] select-none tracking-widest uppercase">
           Excited
-          <Sun size={14} className="text-theme-sage" />
+          <Sun size={14} className="text-[#6B7D5C]/40" />
         </div>
-        <div className="absolute bottom-5 left-5 flex items-center gap-2 text-[10px] font-semibold text-theme-olive/30 select-none tracking-widest uppercase">
-          <CloudRain size={14} className="text-theme-sage" />
+        <div className="absolute bottom-5 left-5 flex items-center gap-2 text-[10px] font-semibold text-[#6E6E6E] select-none tracking-widest uppercase">
+          <CloudRain size={14} className="text-[#6B7D5C]/40" />
           Sad
         </div>
-        <div className="absolute bottom-5 right-5 flex items-center gap-2 text-[10px] font-semibold text-theme-olive/30 select-none tracking-widest uppercase">
+        <div className="absolute bottom-5 right-5 flex items-center gap-2 text-[10px] font-semibold text-[#6E6E6E] select-none tracking-widest uppercase">
           Relaxed
-          <Wind size={14} className="text-theme-olive/40" />
+          <Wind size={14} className="text-[#6B7D5C]/40" />
         </div>
 
         <div 
           ref={markerRef}
-          className="absolute w-12 h-12 -ml-6 -mt-6 rounded-full border-4 border-white cursor-grab active:cursor-grabbing shadow-xl shadow-theme-olive/10"
+          className="absolute w-10 h-10 -ml-5 -mt-5 rounded-full border-[3px] border-white cursor-grab active:cursor-grabbing shadow-md"
           style={{ 
             left: markerLeft, 
             top: markerTop,
-            transform: isDragging ? 'scale(1.15)' : 'scale(1)',
-            transition: 'background-color 0.4s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+            transform: isDragging ? 'scale(1.2)' : 'scale(1)',
+            transition: 'background-color 0.4s ease, transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
           }}
         ></div>
       </div>
 
-      <div className="glass-panel px-10 py-4 rounded-3xl text-[11px] font-semibold tracking-[0.2em] text-theme-olive/50 mb-14 uppercase">
+      <div className="glass-panel px-10 py-4 rounded-3xl text-[11px] font-semibold tracking-[0.2em] text-[#6E6E6E] mb-14 uppercase">
         Valence: {position.x.toFixed(2)} &nbsp;|&nbsp; Arousal: {position.y.toFixed(2)}
       </div>
 
       <button
         onClick={() => onComplete({ valence: position.x, arousal: position.y })}
-        className="px-14 py-5 rounded-full bg-theme-olive text-white font-medium tracking-widest uppercase text-[11px] shadow-lg shadow-theme-olive/20 hover:scale-105 active:scale-95 transition-all duration-300"
+        className="px-14 py-5 rounded-[24px] bg-[#6B7D5C] text-white font-medium tracking-widest uppercase text-[11px] shadow-md hover:scale-105 active:scale-95 transition-all duration-300"
       >
         Next Phase
       </button>

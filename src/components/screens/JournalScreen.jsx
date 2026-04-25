@@ -32,24 +32,24 @@ export default function JournalScreen({ sessionData, onComplete }) {
 
   return (
     <div className="flex flex-col items-center justify-center p-6 w-full max-w-xl fade-in min-h-screen relative z-10">
-      <h2 className="text-4xl font-serif font-medium mb-10 text-center text-theme-olive tracking-tight">Capture your thoughts</h2>
+      <h2 className="text-4xl font-serif font-medium mb-10 text-center text-[#2F2F2F] tracking-tight">Capture your thoughts</h2>
 
       <div className="w-full relative mb-12 group">
         <textarea
-          className="w-full h-64 glass-panel p-8 text-lg text-theme-olive/80 placeholder:text-theme-olive/20 focus:outline-none focus:border-theme-olive/20 resize-none transition-all duration-300 font-sans font-light leading-relaxed shadow-sm"
+          className="w-full h-64 bg-[#F7F8F4] border border-[#6B7D5C]/10 rounded-[24px] p-8 text-lg text-[#2F2F2F] placeholder:text-[#6E6E6E]/30 focus:outline-none focus:border-[#6B7D5C]/30 resize-none transition-all duration-300 font-sans font-light leading-relaxed shadow-sm"
           placeholder="How are you feeling right now? (minimum 3 words)"
           value={journal}
           onChange={(e) => setJournal(e.target.value)}
         ></textarea>
 
-        <div className={`absolute bottom-4 right-8 text-[10px] uppercase tracking-[0.2em] transition-colors duration-300 font-bold ${isOverLimit ? 'text-rose-400' : 'text-theme-olive/30'}`}>
+        <div className={`absolute bottom-4 right-8 text-[10px] uppercase tracking-[0.2em] transition-colors duration-300 font-bold ${isOverLimit ? 'text-rose-400' : 'text-[#6E6E6E]/30'}`}>
           {charCount} / 200 {isOverLimit && "(limit)"}
         </div>
       </div>
 
       <button
         onClick={handleComplete}
-        className="px-14 py-5 rounded-full bg-theme-olive text-white font-medium tracking-widest uppercase text-[11px] shadow-lg shadow-theme-olive/20 hover:scale-105 active:scale-95 transition-all duration-300"
+        className="px-14 py-5 rounded-[24px] bg-[#6B7D5C] text-white font-medium tracking-widest uppercase text-[11px] shadow-md hover:scale-105 active:scale-95 transition-all duration-300"
       >
         Complete Session
       </button>

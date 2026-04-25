@@ -36,11 +36,11 @@
   --color-accent-olive: #6B7D5C;
   --color-accent-sage: #A3B18A;
   --color-text-main: #2F2F2F;
-  --color-text-muted: #5F5F5F;
+  --color-text-secondary: #6E6E6E;
   
-  --glass-bg: rgba(255, 255, 255, 0.4);
-  --glass-border: rgba(107, 125, 92, 0.1);
-  --glass-shadow: 0 10px 40px rgba(107, 125, 92, 0.08);
+  --glass-bg: rgba(238, 241, 232, 0.4); /* Light olive tint glass */
+  --glass-border: rgba(107, 125, 92, 0.08);
+  --glass-shadow: 0 10px 40px rgba(107, 125, 92, 0.05);
 }
 
 @layer base {

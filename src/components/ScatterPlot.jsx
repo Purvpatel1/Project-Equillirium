@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function ScatterPlot({ sessions = [], width = 300, height = 300, small = false }) {
+export default function ScatterPlot({ sessions = [], width = 300, height = 300, small = false, light = false }) {
   const [hoveredSession, setHoveredSession] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const padding = small ? 10 : 40;
@@ -11,11 +11,11 @@ export default function ScatterPlot({ sessions = [], width = 300, height = 300, 
   const mapY = (arousal) => padding + ((1 - arousal) / 2) * plotHeight;
 
   const getQuadrantColor = (v, a) => {
-    if (v >= 0 && a >= 0) return '#FFD700'; // Top-Right
-    if (v < 0 && a >= 0) return '#FF4444'; // Top-Left
-    if (v < 0 && a < 0) return '#4169E1'; // Bottom-Left
-    if (v >= 0 && a < 0) return '#90EE90'; // Bottom-Right
-    return '#ffffff';
+    if (v >= 0 && a >= 0) return '#6B7D5C'; // Positive
+    if (v < 0 && a >= 0) return '#A3B18A'; // Stressed
+    if (v < 0 && a < 0) return '#8B9B7E'; // Low valence
+    if (v >= 0 && a < 0) return '#C2D1B2'; // Relaxed
+    return '#6B7D5C';
   };
 
   const sortedSessions = [...sessions].sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -29,15 +29,15 @@ export default function ScatterPlot({ sessions = [], width = 300, height = 300, 
   return (
     <div className="relative fade-in" style={{ width, height }}>
       <svg width={width} height={height} className="overflow-visible">
-        <line x1={padding} y1={height / 2} x2={width - padding} y2={height / 2} stroke="#333" strokeWidth="1" strokeDasharray="4" />
-        <line x1={width / 2} y1={padding} x2={width / 2} y2={height - padding} stroke="#333" strokeWidth="1" strokeDasharray="4" />
+        <line x1={padding} y1={height / 2} x2={width - padding} y2={height / 2} stroke={light ? "rgba(107,125,92,0.1)" : "#333"} strokeWidth="1" strokeDasharray="4" />
+        <line x1={width / 2} y1={padding} x2={width / 2} y2={height - padding} stroke={light ? "rgba(107,125,92,0.1)" : "#333"} strokeWidth="1" strokeDasharray="4" />
 
         {!small && (
           <>
-            <text x={width - padding + 5} y={height / 2 + 4} fontSize="10" fill="#666">Pos</text>
-            <text x={padding - 25} y={height / 2 + 4} fontSize="10" fill="#666">Neg</text>
-            <text x={width / 2 - 12} y={padding - 10} fontSize="10" fill="#666">High</text>
-            <text x={width / 2 - 10} y={height - padding + 20} fontSize="10" fill="#666">Low</text>
+            <text x={width - padding + 5} y={height / 2 + 4} fontSize="9" fill={light ? "rgba(107,125,92,0.4)" : "#666"} fontWeight="600" textAnchor="start">POS</text>
+            <text x={padding - 35} y={height / 2 + 4} fontSize="9" fill={light ? "rgba(107,125,92,0.4)" : "#666"} fontWeight="600">NEG</text>
+            <text x={width / 2} y={padding - 15} fontSize="9" fill={light ? "rgba(107,125,92,0.4)" : "#666"} fontWeight="600" textAnchor="middle">HIGH</text>
+            <text x={width / 2} y={height - padding + 25} fontSize="9" fill={light ? "rgba(107,125,92,0.4)" : "#666"} fontWeight="600" textAnchor="middle">LOW</text>
           </>
         )}
 
@@ -45,8 +45,8 @@ export default function ScatterPlot({ sessions = [], width = 300, height = 300, 
           <path 
             d={pathD} 
             fill="none" 
-            stroke="rgba(255,255,255,0.3)" 
-            strokeWidth="2" 
+            stroke={light ? "rgba(107,125,92,0.2)" : "rgba(255,255,255,0.3)"} 
+            strokeWidth="2.5" 
             strokeLinejoin="round"
             strokeLinecap="round"
             className="animate-[fadeIn_2s_ease-out_forwards]" 
@@ -58,10 +58,10 @@ export default function ScatterPlot({ sessions = [], width = 300, height = 300, 
             key={i}
             cx={mapX(s.mood.valence)}
             cy={mapY(s.mood.arousal)}
-            r={i === sortedSessions.length - 1 ? (small ? 4 : 8) : (small ? 2.5 : 6)}
+            r={i === sortedSessions.length - 1 ? (small ? 4.5 : 9) : (small ? 3 : 6.5)}
             fill={getQuadrantColor(s.mood.valence, s.mood.arousal)}
-            stroke={i === sortedSessions.length - 1 ? "rgba(255,255,255,0.8)" : "var(--color-cosmic-base)"}
-            strokeWidth={i === sortedSessions.length - 1 ? "2" : "1.5"}
+            stroke={i === sortedSessions.length - 1 ? "rgba(255,255,255,1)" : "rgba(255,255,255,0.5)"}
+            strokeWidth={i === sortedSessions.length - 1 ? "3" : "2"}
             onMouseEnter={(e) => {
               if (small) return;
               setHoveredSession(s);
@@ -76,21 +76,22 @@ export default function ScatterPlot({ sessions = [], width = 300, height = 300, 
 
       {hoveredSession && !small && (
         <div 
-          className="absolute z-50 glass-panel p-3 text-[10px] pointer-events-none fade-in min-w-[120px] backdrop-blur-md border-white/20"
+          className={`absolute z-50 glass-panel p-5 text-[10px] pointer-events-none fade-in min-w-[150px] shadow-2xl ${light ? 'bg-white/90 border-theme-olive/10' : 'backdrop-blur-md border-white/20'}`}
           style={{ 
             left: `${tooltipPos.x}px`, 
-            top: `${tooltipPos.y - 10}px`,
+            top: `${tooltipPos.y - 12}px`,
             transform: 'translate(-50%, -100%)'
           }}
         >
-          <div className="text-white/40 mb-1 font-sans uppercase tracking-tighter">
-            {new Date(hoveredSession.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+          <div className={`${light ? 'text-theme-olive/40' : 'text-white/40'} mb-1.5 font-sans font-bold uppercase tracking-[0.1em]`}>
+            {new Date(hoveredSession.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
           </div>
-          <div className="text-white font-medium mb-1">
-            V: {hoveredSession.mood.valence.toFixed(1)} A: {hoveredSession.mood.arousal.toFixed(1)}
+          <div className={`${light ? 'text-theme-olive' : 'text-white'} font-semibold mb-2 flex justify-between`}>
+            <span>V: {hoveredSession.mood.valence.toFixed(1)}</span>
+            <span>A: {hoveredSession.mood.arousal.toFixed(1)}</span>
           </div>
           {hoveredSession.journal && (
-            <div className="text-teal-200/60 italic line-clamp-2">
+            <div className={`${light ? 'text-theme-olive/60' : 'text-teal-200/60'} italic line-clamp-2 leading-relaxed border-t ${light ? 'border-theme-olive/5' : 'border-white/5'} pt-2 mt-1`}>
               "{hoveredSession.journal}"
             </div>
           )}

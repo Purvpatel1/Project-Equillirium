@@ -32,24 +32,24 @@ export default function JournalScreen({ sessionData, onComplete }) {
 
   return (
     <div className="flex flex-col items-center justify-center p-6 w-full max-w-xl fade-in min-h-screen relative z-10">
-      <h2 className="text-4xl font-serif font-medium mb-10 text-center drop-shadow-lg text-white/90">Capture your thoughts</h2>
+      <h2 className="text-4xl font-serif font-medium mb-10 text-center text-theme-olive tracking-tight">Capture your thoughts</h2>
 
-      <div className="w-full relative mb-10 group">
+      <div className="w-full relative mb-12 group">
         <textarea
-          className="w-full h-64 glass-panel p-6 text-lg text-white/90 placeholder:text-white/40 focus:outline-none focus:border-teal-400 focus:shadow-[0_0_20px_rgba(45,212,191,0.2)] resize-none transition-all duration-300"
+          className="w-full h-64 glass-panel p-8 text-lg text-theme-olive/80 placeholder:text-theme-olive/20 focus:outline-none focus:border-theme-olive/20 resize-none transition-all duration-300 font-sans font-light leading-relaxed shadow-sm"
           placeholder="How are you feeling right now? (minimum 3 words)"
           value={journal}
           onChange={(e) => setJournal(e.target.value)}
         ></textarea>
 
-        <div className={`absolute bottom-4 right-6 text-sm transition-colors duration-300 ${isOverLimit ? 'text-rose-400 font-medium drop-shadow-[0_0_8px_rgba(251,113,133,0.5)]' : 'text-white/50'}`}>
-          {charCount} / 200 {isOverLimit && "(soft limit exceeded)"}
+        <div className={`absolute bottom-4 right-8 text-[10px] uppercase tracking-[0.2em] transition-colors duration-300 font-bold ${isOverLimit ? 'text-rose-400' : 'text-theme-olive/30'}`}>
+          {charCount} / 200 {isOverLimit && "(limit)"}
         </div>
       </div>
 
       <button
         onClick={handleComplete}
-        className="px-12 py-4 rounded-full bg-white/10 border border-white/20 backdrop-blur-md text-white font-medium tracking-wide w-full sm:w-auto hover:bg-white/20 hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-all duration-300"
+        className="px-14 py-5 rounded-full bg-theme-olive text-white font-medium tracking-widest uppercase text-[11px] shadow-lg shadow-theme-olive/20 hover:scale-105 active:scale-95 transition-all duration-300"
       >
         Complete Session
       </button>

@@ -7,10 +7,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        dark: {
-          bg: '#0f0f1a',
-          surface: '#1a1a2e',
-          border: '#2a2a4a'
+        theme: {
+          bg: '#F7F8F4',
+          surface: '#EEF1E8',
+          olive: '#6B7D5C',
+          sage: '#A3B18A',
+          text: '#2F2F2F',
+          muted: '#5F5F5F'
         }
       },
       fontFamily: {

@@ -21,29 +21,44 @@
   animation: idle-pulse 4s ease-in-out infinite;
 }
 
+@keyframes idle-pulse-light {
+  0%, 100% { transform: scale(1); box-shadow: 0 5px 15px rgba(107,125,92,0.15); }
+  50% { transform: scale(1.03); box-shadow: 0 10px 25px rgba(107,125,92,0.25); }
+}
+
+.animate-idle-pulse-light {
+  animation: idle-pulse-light 4s ease-in-out infinite;
+}
+
 :root {
-  --color-cosmic-dark: #07070f;
-  --color-cosmic-base: #0f0f1a;
-  --color-cosmic-purple: #1b162e;
-  --color-cosmic-blue: #0d1b2a;
-  --color-accent-teal: #2DD4BF;
-  --color-accent-gold: #D4AF37;
+  --color-primary-bg: #F7F8F4;
+  --color-secondary-bg: #EEF1E8;
+  --color-accent-olive: #6B7D5C;
+  --color-accent-sage: #A3B18A;
+  --color-text-main: #2F2F2F;
+  --color-text-muted: #5F5F5F;
   
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-border: rgba(107, 125, 92, 0.1);
+  --glass-shadow: 0 10px 40px rgba(107, 125, 92, 0.08);
 }
 
 @layer base {
   body {
-    @apply bg-dark-bg text-white font-sans m-0 p-0 antialiased min-h-screen overflow-x-hidden transition-colors duration-300;
+    @apply bg-[#F7F8F4] text-[#2F2F2F] font-sans m-0 p-0 antialiased min-h-screen overflow-x-hidden transition-colors duration-500;
   }
 }
 
 .animated-gradient-bg {
-  background: linear-gradient(-45deg, var(--color-cosmic-dark), var(--color-cosmic-purple), var(--color-cosmic-blue), var(--color-cosmic-base));
+  background: linear-gradient(-45deg, #F7F8F4, #EEF1E8, #F1F4ED, #F7F8F4);
   background-size: 400% 400%;
-  animation: cosmicGradient 15s ease infinite;
+  animation: lightGradient 15s ease infinite;
+}
+
+@keyframes lightGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -53,18 +68,14 @@
   }
 }
 
-@keyframes cosmicGradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
+
 
 .glass-panel {
   background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
-  border-radius: 24px;
+  border-radius: 28px;
   box-shadow: var(--glass-shadow);
 }
 

@@ -104,8 +104,9 @@ export default function App() {
         className="absolute inset-0 pointer-events-none z-[-1]"
         style={{ 
           backgroundColor: appBgColor || 'transparent',
-          transition: 'background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-          filter: 'blur(40px)'
+          transition: 'background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+          filter: 'blur(60px)',
+          opacity: 0.3
         }}
       ></div>
       

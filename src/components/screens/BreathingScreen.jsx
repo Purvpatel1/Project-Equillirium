@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { vibrate } from '../../utils/haptics';
 import { Play, Pause, Plus, Minus, ArrowUp, ArrowDown, Circle } from 'lucide-react';
 

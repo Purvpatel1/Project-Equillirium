@@ -147,6 +147,14 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
     };
   }, [inhale, hold, exhale, isPaused]);
 
+  // Reset phase when durations change to keep JS logic and CSS animation in sync
+  useEffect(() => {
+    if (phase !== 'Init') {
+      setPhase('Init');
+      phaseRef.current = 'Init';
+    }
+  }, [inhale, hold, exhale]);
+
   // Phase Overlay Tinting
   const getOverlayStyle = () => {
     let bgColor = 'rgba(163, 177, 138, 0.04)'; // sage/exhale
@@ -166,47 +174,19 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
   };
 
   // Derived styles for GPU accelerated blob transition
+  // Derived styles for GPU accelerated blob transition
   const getBlobContainerStyle = () => {
-    // Step 1: Initial Render State -> NO transition
-    if (phase === 'Init') {
+    // Standard static styles for Init/Reduced Motion
+    if (phase === 'Init' || phase === 'InitTransition' || isReducedMotion) {
       return {
-        transform: 'scale(0.95)',
-        transition: 'none',
-        filter: 'drop-shadow(0 0 20px rgba(124, 92, 191, 0.2))'
+        transform: phase === 'Inhale' || phase === 'Hold' ? 'scale(1.5)' : 'scale(0.95)',
+        opacity: isReducedMotion ? (phase === 'Inhale' || phase === 'Hold' ? 0.9 : 0.5) : 1,
+        transition: isReducedMotion ? `opacity ${exhale}s ease-in-out` : 'none',
+        filter: `drop-shadow(0 0 ${10 + level * 3}px rgba(163, 177, 138, 0.1))`
       };
     }
 
-    let scale = 0.95;
-    let duration = exhale;
-
-    if (phase === 'InitTransition') {
-      scale = 0.95;
-      duration = inhale; // Prep transition duration
-    } else if (phase === 'Inhale') {
-      scale = 1.5;
-      duration = inhale;
-    } else if (phase === 'Hold') {
-      scale = 1.5;
-      duration = hold; // Scale remains stable
-    } else if (phase === 'Exhale') {
-      scale = 0.95;
-      duration = exhale; // Contracts smoothly
-    }
-
-    if (isReducedMotion) {
-      return {
-        opacity: phase === 'Inhale' || phase === 'Hold' ? 0.9 : 0.5,
-        transition: `opacity ${duration}s ease-in-out`
-      };
-    }
-
-    return {
-      transform: `scale(${scale})`,
-      transition: `transform ${duration}s cubic-bezier(0.4, 0, 0.2, 1), filter ${duration}s ease-in-out`,
-      filter: phase === 'Inhale' || phase === 'Hold'
-        ? `drop-shadow(0 0 ${20 + level * 5}px rgba(107, 125, 92, 0.15))`
-        : `drop-shadow(0 0 ${10 + level * 3}px rgba(163, 177, 138, 0.1))`
-    };
+    return {};
   };
 
   const getInstructionText = (p) => {
@@ -257,8 +237,17 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
     let duration = exhale;
     if (phase === 'Inhale') duration = inhale;
     if (phase === 'Hold') duration = hold;
+    // Special case for InitTransition to avoid jump
+    if (phase === 'InitTransition') return 'none';
     return `stroke-dashoffset ${duration}s linear`;
   };
+
+  // Continuous Cycle Logic (for visual smoothness)
+  const totalDuration = inhale + hold + exhale;
+  const inhalePercent = (inhale / totalDuration) * 100;
+  const holdPercent = ((inhale + hold) / totalDuration) * 100;
+  const shadowInhale = `0 0 ${20 + level * 5}px rgba(107, 125, 92, 0.15)`;
+  const shadowExhale = `0 0 ${10 + level * 3}px rgba(163, 177, 138, 0.1)`;
 
   const css = `
     @keyframes ripple {
@@ -291,6 +280,36 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
     }
     .text-in {
       animation: textFadeIn 0.3s ease forwards;
+    }
+
+    @keyframes breatheCycle {
+      0%, 100% { 
+        transform: scale(0.95); 
+        filter: drop-shadow(${shadowExhale});
+      }
+      ${inhalePercent}% { 
+        transform: scale(1.5); 
+        filter: drop-shadow(${shadowInhale});
+      }
+      ${holdPercent}% { 
+        transform: scale(1.5); 
+        filter: drop-shadow(${shadowInhale});
+      }
+    }
+
+    @keyframes pathCycle {
+      0%, 100% { d: path("${pathExhale}"); }
+      ${inhalePercent}%, ${holdPercent}% { d: path("${pathInhale}"); }
+    }
+
+    .blob-cycling {
+      animation: breatheCycle ${totalDuration}s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      animation-play-state: ${isPaused ? 'paused' : 'running'};
+    }
+
+    .path-cycling {
+      animation: pathCycle ${totalDuration}s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      animation-play-state: ${isPaused ? 'paused' : 'running'};
     }
 
     @keyframes gradientShift {
@@ -403,7 +422,10 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
             )}
 
             {/* Central Blob with Integrated Text */}
-            <div className="absolute w-[240px] h-[240px] flex items-center justify-center" style={getBlobContainerStyle()}>
+            <div 
+              className={`absolute w-[240px] h-[240px] flex items-center justify-center ${phase !== 'Init' && phase !== 'InitTransition' && !isReducedMotion ? 'blob-cycling' : ''}`} 
+              style={getBlobContainerStyle()}
+            >
               {/* Blob SVG */}
               <div className="absolute inset-0 opacity-100 drop-shadow-[0_15px_35px_rgba(107,125,92,0.12)]">
                 <svg viewBox="0 0 200 200" className="w-full h-full overflow-visible">
@@ -420,13 +442,12 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
                   <path
                     d={getBlobPath()}
                     fill="url(#blobGradient)"
-                    style={getBlobPathStyle()}
+                    className={phase !== 'Init' && phase !== 'InitTransition' && !isReducedMotion ? 'path-cycling' : ''}
                   />
                   <path
                     d={getBlobPath()}
                     fill="url(#innerLight)"
-                    style={getBlobPathStyle()}
-                    className="pointer-events-none"
+                    className={`pointer-events-none ${phase !== 'Init' && phase !== 'InitTransition' && !isReducedMotion ? 'path-cycling' : ''}`}
                   />
                 </svg>
               </div>

@@ -179,14 +179,16 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
     // Standard static styles for Init/Reduced Motion
     if (phase === 'Init' || phase === 'InitTransition' || isReducedMotion) {
       return {
-        transform: phase === 'Inhale' || phase === 'Hold' ? 'scale(1.5)' : 'scale(0.95)',
+        transform: phase === 'Inhale' || phase === 'Hold' ? 'scale(1.3)' : 'scale(1)',
         opacity: isReducedMotion ? (phase === 'Inhale' || phase === 'Hold' ? 0.9 : 0.5) : 1,
         transition: isReducedMotion ? `opacity ${exhale}s ease-in-out` : 'none',
         filter: `drop-shadow(0 0 ${10 + level * 3}px rgba(163, 177, 138, 0.1))`
       };
     }
 
-    return {};
+    return {
+      animationPlayState: isPaused ? 'paused' : 'running'
+    };
   };
 
   const getInstructionText = (p) => {
@@ -242,12 +244,48 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
     return `stroke-dashoffset ${duration}s linear`;
   };
 
-  // Continuous Cycle Logic (for visual smoothness)
-  const totalDuration = inhale + hold + exhale;
-  const inhalePercent = (inhale / totalDuration) * 100;
-  const holdPercent = ((inhale + hold) / totalDuration) * 100;
-  const shadowInhale = `0 0 ${20 + level * 5}px rgba(107, 125, 92, 0.15)`;
-  const shadowExhale = `0 0 ${10 + level * 3}px rgba(163, 177, 138, 0.1)`;
+  // Continuous Cycle Logic - Calculated once per setting change to ensure perfect smoothness
+  const { totalDuration, inhalePercent, holdPercent, dynamicStyles } = useMemo(() => {
+    const total = inhale + hold + exhale;
+    const iPercent = (inhale / total) * 100;
+    const hPercent = ((inhale + hold) / total) * 100;
+
+    // Derived visual tokens
+    const sInhale = `0 0 ${20 + level * 5}px rgba(107, 125, 92, 0.15)`;
+    const sExhale = `0 0 ${10 + level * 3}px rgba(163, 177, 138, 0.1)`;
+
+    const styles = `
+      @keyframes breatheCycle {
+        0%, 100% { 
+          transform: scale(1); 
+          filter: drop-shadow(${sExhale});
+        }
+        ${iPercent}% { 
+          transform: scale(1.3); 
+          filter: drop-shadow(${sInhale});
+        }
+        ${hPercent}% { 
+          transform: scale(1.3); 
+          filter: drop-shadow(${sInhale});
+        }
+      }
+
+      @keyframes pathCycle {
+        0%, 100% { d: path("${pathExhale}"); }
+        ${iPercent}%, ${hPercent}% { d: path("${pathInhale}"); }
+      }
+
+      .blob-cycling {
+        animation: breatheCycle ${total}s ease-in-out infinite;
+      }
+
+      .path-cycling {
+        animation: pathCycle ${total}s ease-in-out infinite;
+      }
+    `;
+
+    return { totalDuration: total, inhalePercent: iPercent, holdPercent: hPercent, dynamicStyles: styles };
+  }, [inhale, hold, exhale, level, pathInhale, pathExhale]);
 
   const css = `
     @keyframes ripple {
@@ -282,35 +320,7 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
       animation: textFadeIn 0.3s ease forwards;
     }
 
-    @keyframes breatheCycle {
-      0%, 100% { 
-        transform: scale(0.95); 
-        filter: drop-shadow(${shadowExhale});
-      }
-      ${inhalePercent}% { 
-        transform: scale(1.5); 
-        filter: drop-shadow(${shadowInhale});
-      }
-      ${holdPercent}% { 
-        transform: scale(1.5); 
-        filter: drop-shadow(${shadowInhale});
-      }
-    }
-
-    @keyframes pathCycle {
-      0%, 100% { d: path("${pathExhale}"); }
-      ${inhalePercent}%, ${holdPercent}% { d: path("${pathInhale}"); }
-    }
-
-    .blob-cycling {
-      animation: breatheCycle ${totalDuration}s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-      animation-play-state: ${isPaused ? 'paused' : 'running'};
-    }
-
-    .path-cycling {
-      animation: pathCycle ${totalDuration}s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-      animation-play-state: ${isPaused ? 'paused' : 'running'};
-    }
+    ${dynamicStyles}
 
     @keyframes gradientShift {
       0%   { background-position: 0% 50%; }
@@ -443,11 +453,13 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
                     d={getBlobPath()}
                     fill="url(#blobGradient)"
                     className={phase !== 'Init' && phase !== 'InitTransition' && !isReducedMotion ? 'path-cycling' : ''}
+                    style={{ animationPlayState: isPaused ? 'paused' : 'running' }}
                   />
                   <path
                     d={getBlobPath()}
                     fill="url(#innerLight)"
                     className={`pointer-events-none ${phase !== 'Init' && phase !== 'InitTransition' && !isReducedMotion ? 'path-cycling' : ''}`}
+                    style={{ animationPlayState: isPaused ? 'paused' : 'running' }}
                   />
                 </svg>
               </div>

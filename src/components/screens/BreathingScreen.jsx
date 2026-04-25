@@ -320,13 +320,17 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
     }
 
     .control-container {
-      background: rgba(255, 255, 255, 0.5);
-      backdrop-filter: blur(24px);
+      background: rgba(235, 238, 228, 0.9);
+      backdrop-filter: blur(12px);
       border-radius: 32px;
-      border: 1px solid rgba(107, 125, 92, 0.08);
+      border: 1px solid rgba(120, 130, 100, 0.2);
       box-shadow: 
-        0 20px 40px -10px rgba(107, 125, 92, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        0 8px 30px rgba(0,0,0,0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+
+    .control-divider {
+      border-top: 1px dashed rgba(120, 130, 100, 0.2);
     }
   `;
 
@@ -436,7 +440,7 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
 
         {/* Guidance Text (Secondary Feedback) */}
         {!isPaused && phase !== 'Init' && (
-          <div className="text-[clamp(0.85rem,1.5vw,1rem)] text-teal-200/50 font-sans tracking-[0.1em] text-center animate-pulse h-5 mb-4 shrink-0">
+          <div className="text-[clamp(0.85rem,1.5vw,1rem)] text-[#6B7D5C]/60 font-sans tracking-[0.1em] text-center animate-pulse h-5 mb-4 shrink-0">
             {guidanceText}
           </div>
         )}
@@ -448,7 +452,7 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
               <button
                 key={p.id}
                 onClick={() => selectPreset(p)}
-                className={`px-4 py-2 rounded-xl text-[10px] uppercase tracking-widest border transition-all duration-300 ${inhale === p.inhale && hold === p.hold && exhale === p.exhale ? 'bg-teal-400/20 border-teal-400/40 text-teal-300' : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'}`}
+                className={`px-4 py-2 rounded-xl text-[10px] uppercase tracking-widest border transition-all duration-300 ${inhale === p.inhale && hold === p.hold && exhale === p.exhale ? 'bg-[#6B7D5C]/20 border-[#6B7D5C]/40 text-[#6B7D5C]' : 'bg-white/40 border-black/5 text-[#6B7D5C]/50 hover:bg-white/60'}`}
               >
                 {p.name}
               </button>
@@ -457,33 +461,33 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
         )}
 
         {/* Controls - Enhanced Glassmorphism Panel (Compressed) */}
-        <div className="control-container p-6 flex flex-col items-center gap-6 text-sm text-gray-300 w-full max-w-md shrink-0">
+        <div className="control-container p-6 flex flex-col items-center gap-6 text-sm text-gray-800 w-full max-w-md shrink-0">
 
-          {/* Pause/Play Button - Enhanced */}
+          {/* Pause/Play Button - Enhanced Visibility */}
           <button
             onClick={() => {
               setIsPaused(!isPaused);
               vibrate(20);
             }}
-            className={`w-14 h-14 rounded-full flex items-center justify-center text-white transition-all duration-300 transform hover:scale-110 active:scale-95 shadow-[0_0_20px_rgba(124,92,191,0.3)] border border-white/20 ${isPaused ? 'bg-teal-500/20' : 'bg-white/10'}`}
+            className={`w-14 h-14 rounded-full flex items-center justify-center text-white transition-all duration-300 transform hover:scale-110 active:scale-95 shadow-[0_0_20px_rgba(143,169,122,0.4)] bg-[#8FA97A]`}
             aria-label={isPaused ? "Resume" : "Pause"}
           >
             {isPaused ? <Play size={24} className="ml-1 fill-white/20" /> : <Pause size={24} className="fill-white/20" />}
           </button>
 
-          <div className="flex justify-between w-full gap-4">
+          <div className="flex justify-between w-full gap-4 control-divider pt-6">
             {[
-              { label: 'Inhale', value: inhale, setter: setInhale, min: 2, max: 10, icon: ArrowUp, color: 'text-teal-400' },
-              { label: 'Hold', value: hold, setter: setHold, min: 0, max: 10, icon: Circle, color: 'text-indigo-400' },
-              { label: 'Exhale', value: exhale, setter: setExhale, min: 2, max: 15, icon: ArrowDown, color: 'text-rose-400' }
+              { label: 'Inhale', value: inhale, setter: setInhale, min: 2, max: 10, icon: ArrowUp, color: 'text-[#6b7d5c]' },
+              { label: 'Hold', value: hold, setter: setHold, min: 0, max: 10, icon: Circle, color: 'text-[#8c9a7a]' },
+              { label: 'Exhale', value: exhale, setter: setExhale, min: 2, max: 15, icon: ArrowDown, color: 'text-[#a36f6f]' }
             ].map((ctrl) => (
               <div key={ctrl.label} className="flex flex-col items-center flex-1 group">
                 <div className="flex flex-col items-center gap-1 mb-2">
-                  <ctrl.icon size={10} className={`${ctrl.color} opacity-40 group-hover:opacity-100 transition-opacity`} />
-                  <span className="text-[9px] uppercase tracking-[0.2em] text-white/30 font-sans font-medium">{ctrl.label}</span>
+                  <ctrl.icon size={12} className={`${ctrl.color} opacity-90 transition-opacity`} />
+                  <span className="text-[9px] uppercase tracking-[0.12em] text-[#3c4632]/80 font-sans font-bold">{ctrl.label}</span>
                 </div>
                 
-                <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/5 hover:border-teal-500/30 transition-all duration-300">
+                <div className="flex items-center gap-1 bg-white/40 p-1 rounded-xl border border-black/5 hover:border-[#6B7D5C]/30 transition-all duration-300">
                   <button 
                     onClick={() => {
                       if (ctrl.value > ctrl.min) {
@@ -491,12 +495,12 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
                         vibrate(10);
                       }
                     }}
-                    className="p-1 rounded-lg hover:bg-white/5 text-white/40 hover:text-white transition-colors"
+                    className="p-1 rounded-lg hover:bg-white/60 text-[#6B7D5C]/40 hover:text-[#6B7D5C] transition-colors"
                   >
                     <Minus size={12} />
                   </button>
                   
-                  <div key={ctrl.value} className="w-6 text-center font-sans font-bold text-[var(--color-text-main)] text-xs value-pop">
+                  <div key={ctrl.value} className="w-6 text-center font-sans font-bold text-[#2f332a] text-sm value-pop">
                     {ctrl.value}
                   </div>
 
@@ -507,7 +511,7 @@ export default function BreathingScreen({ onComplete, level = 1 }) {
                         vibrate(10);
                       }
                     }}
-                    className="p-1 rounded-lg hover:bg-white/5 text-white/40 hover:text-white transition-colors"
+                    className="p-1 rounded-lg hover:bg-white/60 text-[#6B7D5C]/40 hover:text-[#6B7D5C] transition-colors"
                   >
                     <Plus size={12} />
                   </button>
